@@ -1,0 +1,26 @@
+[build-system]
+requires = [
+  "setuptools>=80",
+  "setuptools-scm>=9",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "blocky-blocking-editor"
+dynamic = ["version"]
+description = "Streamlit editor for Blocky DNS blocking configuration"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+dependencies = [
+  "streamlit==1.39.0",
+  "pyyaml==6.0.2",
+  "streamlit-authenticator==0.3.3",
+]
+
+[tool.setuptools]
+py-modules = ["app"]
+
+[tool.setuptools_scm]
+

@@ -1,6 +1,7 @@
 import json
 import os
 import uuid
+from importlib.metadata import PackageNotFoundError, version
 
 import streamlit as st
 import yaml
@@ -10,6 +11,11 @@ BLOCKY_CONFIG_DIR = "/app/blocky_config"
 DB_PATH = os.path.join(DB_DIR, "app_db.json")
 GENERATED_YAML_NAME = os.getenv("GENERATED_YAML_NAME", "20_parental_generated.yml")
 GENERATED_YAML_PATH = os.path.join(BLOCKY_CONFIG_DIR, GENERATED_YAML_NAME)
+
+try:
+    APP_VERSION = version("blocky-blocking-editor")
+except PackageNotFoundError:
+    APP_VERSION = "development"
 
 st.set_page_config(page_title="Blocky Parental UI", page_icon="🛡️", layout="wide")
 
@@ -126,6 +132,7 @@ def compile_blocky_yaml():
 
 
 st.title("🛡️ Blocky DNS Parental Control")
+st.caption(f"Version {APP_VERSION}")
 st.write("Manage blocklists, allowlists, timetables, and devices dynamically.")
 tab1, tab2, tab3 = st.tabs(["🌐 Lists & Categories", "⏱️ Schedules", "📱 Devices"])
 

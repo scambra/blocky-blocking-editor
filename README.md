@@ -77,6 +77,32 @@ The UI is then available at <http://localhost:8080>. Adjust the published
 ports, timezone, image version, and networking in the example for your
 environment.
 
+## Versions and releases
+
+The Python package version is derived from Git tags by `setuptools-scm`; it is
+not stored manually in the source tree. Use PEP 440-compatible release tags
+with a `v` prefix, for example:
+
+```sh
+git tag -a v1.0.0 -m "Release 1.0.0"
+git push origin v1.0.0
+```
+
+Pushing the tag starts the release workflow; creating a GitHub Release is
+optional. The workflow builds the image for `linux/amd64` and `linux/arm64`
+and publishes it to GHCR as
+`ghcr.io/OWNER/REPOSITORY:1.0.0`, `:1.0`, `:1`, and `:latest`. Pre-release
+versions do not replace the stable aliases.
+
+For a local image build, pass the desired version explicitly because the Git
+metadata is intentionally not copied into the container build:
+
+```sh
+docker build \
+  --build-arg SETUPTOOLS_SCM_PRETEND_VERSION=0.1.0.dev0 \
+  -t blocky-blocking-editor:dev .
+```
+
 ### Watcher behavior and security
 
 The watcher listens for completed writes or replacements of
