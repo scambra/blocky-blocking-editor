@@ -1,0 +1,49 @@
+name: blocky
+
+services:
+  blocky:
+    image: ghcr.io/0xerr0r/blocky:v0.35.0
+    container_name: blocky
+    restart: unless-stopped
+    environment:
+      BLOCKY_CONFIG_FILE: /app/config
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "4000:4000/tcp"
+    volumes:
+      - ./runtime/blocky-config:/app/config:ro
+
+  blocky-blocking-editor:
+    image: ghcr.io/scambra/blocky-blocking-editor:latest
+    container_name: blocky_ui
+    restart: unless-stopped
+    environment:
+      GENERATED_YAML_NAME: 20_parental_generated.yml
+    ports:
+      - "8080:8080/tcp"
+    volumes:
+      - ./runtime/blocky-config:/app/blocky_config
+      - ./runtime/blocky-blocking-editor:/app/data
+
+  blocky-watcher:
+    image: alpine:latest
+    container_name: blocky_watcher
+    restart: unless-stopped
+    depends_on:
+      - blocky
+    volumes:
+      - ./runtime/blocky-config:/watch/config:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    entrypoint: >-
+      /bin/sh -c '
+      apk add --no-cache docker-cli inotify-tools;
+      echo "Watching for Blocky UI configuration changes...";
+      inotifywait -q -m -e close_write,moved_to --format "%f" /watch/config |
+      while read -r changed_file; do
+        if [ "$$changed_file" = "20_parental_generated.yml" ]; then
+          echo "Generated configuration changed; restarting Blocky...";
+          docker restart blocky;
+        fi;
+      done
+      '
